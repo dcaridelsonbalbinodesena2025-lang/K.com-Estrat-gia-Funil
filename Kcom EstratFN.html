@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Funil Profissional - V7.2</title>
+    <style>
+        :root {
+            --bg-main: #121214;
+            --bg-card: #202024;
+            --bg-input: #121214;
+            --border-color: #29292e;
+            --text-main: #ffffff;
+            --text-muted: #a8a8b3;
+            --color-green: #04d361;
+            --color-green-dark: #115732;
+            --color-red: #ff6b6b;
+            --color-red-dark: #5a1818;
+            --color-blue: #4ba3ff;
+            --color-blue-dark: #113657;
+            --color-accent: #633bbc;
+            --color-orange: #ff9000;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 440px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Menu de Abas Superior */
+        .tab-menu {
+            display: flex;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 4px;
+            border: 1px solid var(--border-color);
+            gap: 2px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px 4px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            background-color: var(--color-accent);
+            color: #fff;
+        }
+
+        /* Controle de Visibilidade das Telas */
+        .app-view {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .app-view.active {
+            display: flex;
+        }
+
+        /* Banner de Alerta Urgente */
+        .alert-banner {
+            background-color: var(--color-red-dark);
+            border: 2px solid var(--color-red);
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 13px;
+            animation: pulse 1s infinite;
+        }
+
+        .alert-banner button {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 6px 12px;
+            margin-top: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            margin-right: 4px;
+        }
+
+        @keyframes pulse {
+            0 { opacity: 0.9; transform: scale(1); }
+            50% { opacity: 1; border-color: #fff; transform: scale(1.01); }
+            100% { opacity: 0.9; transform: scale(1); }
+        }
+
+        /* Top Dynamic Result Box */
+        .result-box {
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            min-height: 55px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            gap: 4px;
+        }
+
+        .result-box .proj-text { font-size: 12px; font-weight: normal; opacity: 0.9; }
+        .result-box .mercado-text { font-size: 11px; font-weight: bold; margin-top: 2px; text-transform: uppercase; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 4px; border: 1px dashed rgba(255,255,255,0.2); }
+
+        .result-box.empty { color: var(--text-muted); font-style: italic; font-weight: normal; }
+        .result-box.valido { background-color: var(--color-green-dark); color: var(--color-green); border: 1px solid var(--color-green); }
+        .result-box.invalido { background-color: var(--color-red-dark); color: var(--color-red); border: 1px solid var(--color-red); }
+
+        /* Compact Form Card */
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            text-align: center;
+            font-size: 18px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Grades de layout compactas */
+        .form-row-two {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .form-row-three {
+            display: grid;
+            grid-template-columns: 1.2fr 0.9fr 0.9fr;
+            gap: 8px;
+        }
+
+        .form-row-four {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 6px;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--text-muted);
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-input);
+            color: var(--text-main);
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--color-accent);
+        }
+
+        .action-buttons-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        button.btn-primary {
+            width: 100%;
+            padding: 6px;
+            background-color: var(--color-green);
+            border: none;
+            color: #000;
+            font-weight: bold;
+            font-size: 13px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button.btn-primary:hover { background-color: #03b853; }
+
+        button.btn-waiting {
+            width: 100%;
+            padding: 6px;
+            background-color: var(--color-orange);
+            border: none;
+            color: #000;
+            font-weight: bold;
+            font-size: 13px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button.btn-waiting:hover { background-color: #e07f00; }
+
+        button.btn-clear-main {
+            grid-column: span 2;
+            width: 100%;
+            padding: 6px;
+            background-color: #2a2a30;
+            border: 1px solid #444;
+            color: #fff;
+            font-weight: bold;
+            font-size: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 4px;
+        }
+        button.btn-clear-main:hover { background-color: #3f3f46; }
+
+        /* Dashboard & Thermometer */
+        .dashboard-card {
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .stats-item {
+            background: var(--bg-input);
+            padding: 6px 1px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-val { font-size: 13px; font-weight: bold; }
+        .stat-val.green { color: var(--color-green); }
+        .stat-val.red { color: var(--color-red); }
+        .stat-val.blue { color: var(--color-blue); }
+        .stat-val.profit { color: #04d361; }
+        .stat-val.loss { color: #ff6b6b; }
+        .stat-lbl { font-size: 9px; color: var(--text-muted); margin-top: 2px; text-transform: uppercase; }
+
+        .thermometer-container {
+            background: var(--bg-input);
+            border-radius: 10px;
+            height: 20px;
+            width: 100%;
+            position: relative;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .thermometer-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--color-red) 0%, #ffd000 50%, var(--color-green) 100%);
+            transition: width 0.3s ease-out;
+        }
+
+        .thermometer-text {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: bold; color: #000000;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.3);
+        }
+
+        /* Páginas de Histórico e Espera */
+        .history-card {
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            min-height: 300px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .history-header h2 { margin: 0; font-size: 16px; }
+        .btn-clear { background: none; border: 1px solid var(--color-red); color: var(--color-red); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
+
+        .waiting-item {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .waiting-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .waiting-teams {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .waiting-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .waiting-timer {
+            font-size: 14px;
+            font-weight: bold;
+            background-color: #2d2d34;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: var(--color-orange);
+            font-family: monospace;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .waiting-timer.ready {
+            color: var(--color-red);
+            animation: pulse 1s infinite;
+        }
+
+        .btn-waiting-delete {
+            background-color: var(--color-red-dark);
+            color: var(--color-red);
+            border: 1px solid var(--color-red);
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .date-group { margin-bottom: 8px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-color); }
+        .date-header-btn { width: 100%; background-color: #2d2d34; color: #fff; padding: 10px 14px; font-size: 14px; font-weight: bold; border: none; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
+        .date-header-btn:hover { background-color: var(--color-accent); }
+        .date-header-btn::after { content: '▼'; font-size: 10px; color: var(--text-muted); }
+        .date-group.active .date-header-btn::after { content: '▲'; }
+        .date-content { display: none; background-color: #16161a; padding: 8px; }
+        .date-group.active .date-content { display: block; }
+        .history-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px; }
+        .history-item:last-child { margin-bottom: 0; }
+        .history-item.status-green { border-left: 4px solid var(--color-green); }
+        .history-item.status-red { border-left: 4px solid var(--color-red); }
+        .history-item.status-refund { border-left: 4px solid var(--color-blue); }
+        .history-item.status-pending { border-left: 4px solid var(--text-muted); }
+        .item-main { display: flex; justify-content: space-between; align-items: center; }
+        .item-teams { font-weight: bold; font-size: 13px; }
+        .item-strategy { font-size: 10px; background: #2d2d34; padding: 2px 5px; border-radius: 3px; color: var(--text-muted); font-weight: bold; }
+        .item-details { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+        .item-verdict { font-size: 11px; font-weight: bold; margin-top: 2px; }
+        .item-verdict.go { color: var(--color-green); }
+        .item-verdict.no-go { color: var(--color-red); }
+        .item-actions { display: flex; gap: 4px; margin-top: 6px; border-top: 1px solid #2d2d34; padding-top: 6px; }
+        .btn-action { flex: 1; padding: 6px; font-size: 11px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; text-align: center; }
+        .btn-green { background-color: var(--color-green-dark); color: var(--color-green); border: 1px solid var(--color-green); }
+        .btn-red { background-color: var(--color-red-dark); color: var(--color-red); border: 1px solid var(--color-red); }
+        .btn-blue { background-color: var(--color-blue-dark); color: var(--color-blue); border: 1px solid var(--color-blue); }
+        .btn-delete { background-color: #2a2a30; color: #fff; border: 1px solid #444; }
+        .status-pill { font-size: 10px; text-transform: uppercase; padding: 2px 5px; border-radius: 3px; font-weight: bold; }
+        .pill-green { background: var(--color-green); color: #000; }
+        .pill-red { background: var(--color-red); color: #fff; }
+        .pill-refund { background: var(--color-blue); color: #000; }
+        .pill-pending { background: #444; color: #aaa; }
+        .empty-history { text-align: center; color: var(--text-muted); font-size: 13px; padding: 30px 15px; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <div id="painelAlertaUrgente" style="display: none;"></div>
+
+    <div class="tab-menu">
+        <button class="tab-btn active" id="btnTabCalc" onclick="mudarTela('calculadora')">🧮 Calculadora</button>
+        <button class="tab-btn" id="btnTabWait" onclick="mudarTela('espera')">⏳ A Espera (<span id="countEspera">0</span>)</button>
+        <button class="tab-btn" id="btnTabHist" onclick="mudarTela('historico')">📅 Histórico</button>
+    </div>
+
+    <div id="telaCalculadora" class="app-view active">
+        <div id="resultadoTop" class="result-box empty">
+            Aguardando preenchimento dos dados para análise...
+        </div>
+
+        <div class="card">
+            <h2>Análise de Funil</h2>
+            
+            <div class="form-row-two">
+                <div class="form-group">
+                    <label>Time Mandante (Casa):</label>
+                    <input type="text" id="timeCasa" placeholder="Ex: Degerfors">
+                </div>
+                <div class="form-group">
+                    <label>Time Visitante (Fora):</label>
+                    <input type="text" id="timeFora" placeholder="Ex: Malmo FF">
+                </div>
+            </div>
+
+            <div class="form-row-two">
+                <div class="form-group">
+                    <label>Cantos Casa:</label>
+                    <input type="number" id="cantosCasa" value="3" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Cantos Fora:</label>
+                    <input type="number" id="cantosFora" value="2" min="0">
+                </div>
+            </div>
+
+            <div class="form-row-three">
+                <div class="form-group">
+                    <label>Estratégia:</label>
+                    <select id="estrategia" onchange="ajustarTempoPadrao()">
+                        <option value="HT">HT</option>
+                        <option value="FT">FT</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tempo (min):</label>
+                    <input type="number" id="tempo" value="35" min="1" max="120">
+                </div>
+                <div class="form-group">
+                    <label>Dif. Gols:</label>
+                    <input type="number" id="diferencaGols" value="0" min="0">
+                </div>
+            </div>
+
+            <div class="form-row-four">
+                <div class="form-group">
+                    <label>AP Casa:</label>
+                    <input type="number" id="apCasa" value="22" min="0">
+                </div>
+                <div class="form-group">
+                    <label>AP Fora:</label>
+                    <input type="number" id="apFora" value="20" min="0">
+                </div>
+                <div class="form-group">
+                    <label>ODD:</label>
+                    <input type="number" id="odd" value="1.80" step="0.01" min="1.01">
+                </div>
+                <div class="form-group">
+                    <label>Stake (R$):</label>
+                    <input type="number" id="stake" value="100.00" step="0.50" min="1">
+                </div>
+            </div>
+
+            <div class="action-buttons-grid">
+                <button class="btn-primary" onclick="analisarESalvar()">Analisar e Salvar</button>
+                <button class="btn-waiting" onclick="adicionarAEspera()">A Espera ⏳</button>
+                <button class="btn-clear-main" onclick="limparCamposFormulario()">Limpar Dados da Tela</button>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-val" id="statGeral">0</div>
+                    <div class="stat-lbl">Análises</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val green" id="statGreen">0</div>
+                    <div class="stat-lbl">Greens</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val red" id="statRed">0</div>
+                    <div class="stat-lbl">Reds</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val blue" id="statRefund">0</div>
+                    <div class="stat-lbl">Reemb.</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val" id="statFinanceiro">R$ 0.00</div>
+                    <div class="stat-lbl">Lucro/Prej</div>
+                </div>
+            </div>
+            
+            <div class="thermometer-container">
+                <div class="thermometer-bar" id="thermometerBar"></div>
+                <div class="thermometer-text" id="thermometerText">Aproveitamento: 0%</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="telaEspera" class="app-view">
+        <div class="history-card">
+            <div class="history-header">
+                <h2>⏳ Partidas em Espera Cronometrada</h2>
+                <button class="btn-clear" onclick="limparTodaEspera()">Limpar Tudo</button>
+            </div>
+            <div id="esperaLista"></div>
+        </div>
+    </div>
+
+    <div id="telaHistorico" class="app-view">
+        <div class="history-card">
+            <div class="history-header">
+                <h2>📋 Registros Filtrados por Dia</h2>
+                <button class="btn-clear" onclick="limparTodoHistorico()">Limpar Tudo</button>
+            </div>
+            <div id="historicoLista"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let historico = JSON.parse(localStorage.getItem('funil_historico')) || [];
+    let listaEspera = JSON.parse(localStorage.getItem('funil_espera')) || [];
+    let intervalId = null;
+    let somAlertaIntervalId = null; 
+
+    window.onload = function() {
+        atualizarDashboard();
+        renderizarHistorico();
+        renderizarEspera();
+        iniciarProcessamentoCronometro();
+    };
+
+    function mudarTela(tela) {
+        document.getElementById('telaCalculadora').classList.remove('active');
+        document.getElementById('telaEspera').classList.remove('active');
+        document.getElementById('telaHistorico').classList.remove('active');
+        
+        document.getElementById('btnTabCalc').classList.remove('active');
+        document.getElementById('btnTabWait').classList.remove('active');
+        document.getElementById('btnTabHist').classList.remove('active');
+
+        if (tela === 'calculadora') {
+            document.getElementById('telaCalculadora').classList.add('active');
+            document.getElementById('btnTabCalc').classList.add('active');
+        } else if (tela === 'espera') {
+            document.getElementById('telaEspera').classList.add('active');
+            document.getElementById('btnTabWait').classList.add('active');
+            renderizarEspera();
+        } else {
+            document.getElementById('telaHistorico').classList.add('active');
+            document.getElementById('btnTabHist').classList.add('active');
+            renderizarHistorico();
+        }
+    }
+
+    function ajustarTempoPadrao() {
+        const estrategia = document.getElementById('estrategia').value;
+        const tempoInput = document.getElementById('tempo');
+        tempoInput.value = (estrategia === "FT") ? "85" : "35";
+    }
+
+    function limparCamposFormulario() {
+        document.getElementById('timeCasa').value = '';
+        document.getElementById('timeFora').value = '';
+        document.getElementById('cantosCasa').value = '3';
+        document.getElementById('cantosFora').value = '2';
+        document.getElementById('estrategia').value = 'HT';
+        document.getElementById('tempo').value = '35';
+        document.getElementById('diferencaGols').value = '0';
+        document.getElementById('apCasa').value = '22';
+        document.getElementById('apFora').value = '20';
+        document.getElementById('odd').value = '1.80';
+        document.getElementById('stake').value = '100.00';
+        
+        document.getElementById('resultadoTop').innerHTML = 'Aguardando preenchimento dos dados para análise...';
+        document.getElementById('resultadoTop').className = "result-box empty";
+    }
+
+    // --- SISTEMA DE AUDIO ---
+    function dispararSireneContinua() {
+        if (somAlertaIntervalId) return;
+        executarBipeSirene();
+        somAlertaIntervalId = setInterval(executarBipeSirene, 1200);
+    }
+
+    function desligarSirene() {
+        if (somAlertaIntervalId) {
+            clearInterval(somAlertaIntervalId);
+            somAlertaIntervalId = null;
+        }
+    }
+
+    function executarBipeSirene() {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            let osc1 = audioCtx.createOscillator();
+            let gain1 = audioCtx.createGain();
+            osc1.type = 'sawtooth'; 
+            osc1.frequency.setValueAtTime(650, audioCtx.currentTime); 
+            gain1.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            osc1.connect(gain1);
+            gain1.connect(audioCtx.destination);
+            osc1.start();
+            osc1.stop(audioCtx.currentTime + 0.3);
+
+            setTimeout(() => {
+                let osc2 = audioCtx.createOscillator();
+                let gain2 = audioCtx.createGain();
+                osc2.type = 'sawtooth';
+                osc2.frequency.setValueAtTime(850, audioCtx.currentTime); 
+                gain2.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                osc2.start();
+                osc2.stop(audioCtx.currentTime + 0.4);
+            }, 350);
+
+        } catch (e) {
+            console.log("Erro ao reproduzir áudio: ", e);
+        }
+    }
+
+    function pararSireneSeNaoHouverAlertas() {
+        const aindaTemAlertaAtivo = listaEspera.some(j => (j.timestampFim - Date.now()) <= 0);
+        if (!aindaTemAlertaAtivo) {
+            desligarSirene();
+        }
+    }
+
+    // --- SALVAR EM ESPERA ---
+    function adicionarAEspera() {
+        const timeCasa = document.getElementById('timeCasa').value.trim() || 'Mandante';
+        const timeFora = document.getElementById('timeFora').value.trim() || 'Visitante';
+        const estrategia = document.getElementById('estrategia').value;
+        const tempoSalvo = parseInt(document.getElementById('tempo').value) || 0;
+        
+        const cantosCasa = parseInt(document.getElementById('cantosCasa').value) || 0;
+        const cantosFora = parseInt(document.getElementById('cantosFora').value) || 0;
+        const diferencaGols = parseInt(document.getElementById('diferencaGols').value) || 0;
+        const apCasa = parseInt(document.getElementById('apCasa').value) || 0;
+        const apFora = parseInt(document.getElementById('apFora').value) || 0;
+        const odd = document.getElementById('odd').value;
+        const stake = document.getElementById('stake').value;
+
+        const alvoMinutos = (estrategia === "HT") ? 30 : 80;
+        const minutosRestantes = alvoMinutos - tempoSalvo;
+
+        if (minutosRestantes <= 0) {
+            alert(`A partida já passou ou está no tempo alvo (${alvoMinutos} min) para esta estratégia!`);
+            return;
+        }
+
+        const segundosTotaisNecessarios = minutosRestantes * 60;
+        const timestampFim = Date.now() + (segundosTotaisNecessarios * 1000);
+
+        const novoJogoEspera = {
+            id: String(Date.now()), 
+            timeCasa: timeCasa,
+            timeFora: timeFora,
+            estrategia: estrategia,
+            tempoSalvo: tempoSalvo,
+            alvoMinutos: alvoMinutos,
+            timestampFim: timestampFim,
+            cantosCasa: cantosCasa,
+            cantosFora: cantosFora,
+            diferencaGols: diferencaGols,
+            apCasa: apCasa,
+            apFora: apFora,
+            odd: odd,
+            stake: stake,
+            alertado: false
+        };
+
+        listaEspera.push(novoJogoEspera);
+        localStorage.setItem('funil_espera', JSON.stringify(listaEspera));
+        
+        limparCamposFormulario();
+        renderizarEspera();
+        atualizarContadorEsperaAbas();
+        alert(`Sucesso! ${timeCasa} x ${timeFora} agendado para disparar em ${minutosRestantes} minutos.`);
+    }
+
+    function iniciarProcessamentoCronometro() {
+        if(intervalId) clearInterval(intervalId);
+        intervalId = setInterval(() => {
+            let mudouAlgo = false;
+            let temAlertaAtivo = false;
+            let alertasHtml = "";
+
+            listaEspera.forEach(jogo => {
+                const restanteMilissegundos = jogo.timestampFim - Date.now();
+                
+                if (restanteMilissegundos <= 0) {
+                    if (!jogo.alertado) {
+                        jogo.alertado = true;
+                        mudouAlgo = true;
+                    }
+                    temAlertaAtivo = true;
+                    alertasHtml += `
+                        <div class="alert-banner">
+                            🚨 ENTRAR NA BET365: <b>${jogo.timeCasa} x ${jogo.timeFora}</b> chegou aos ${jogo.alvoMinutos}'m (${jogo.estrategia})!
+                            <br>
+                            <button onclick="autoPreencherAlertaEspera('${jogo.id}')">Auto Preencher</button>
+                            <button onclick="removerAlertaPainel('${jogo.id}')">Remover Alerta</button>
+                        </div>
+                    `;
+                }
+            });
+
+            if (mudouAlgo) {
+                localStorage.setItem('funil_espera', JSON.stringify(listaEspera));
+            }
+
+            const painel = document.getElementById('painelAlertaUrgente');
+            if (temAlertaAtivo) {
+                painel.innerHTML = alertasHtml;
+                painel.style.display = "flex";
+                painel.style.flexDirection = "column";
+                painel.style.gap = "6px";
+                
+                // SÓ TOCA SE O ALERTA ESTIVER VISÍVEL NA TELA PRINCIPAL
+                dispararSireneContinua();
+            } else {
+                painel.style.display = "none";
+                desligarSirene();
+            }
+
+            if (document.getElementById('telaEspera').classList.contains('active')) {
+                renderizarEspera();
+            }
+            atualizarContadorEsperaAbas();
+        }, 1000);
+    }
+
+    function autoPreencherAlertaEspera(id) {
+        const jogo = listaEspera.find(j => String(j.id) === String(id));
+        
+        if (!jogo) {
+            alert("Erro: Jogo não localizado na memória interna.");
+            return;
+        }
+        
+        mudarTela('calculadora');
+        
+        document.getElementById('timeCasa').value = jogo.timeCasa;
+        document.getElementById('timeFora').value = jogo.timeFora;
+        document.getElementById('estrategia').value = jogo.estrategia;
+        document.getElementById('tempo').value = jogo.alvoMinutos; 
+        document.getElementById('cantosCasa').value = jogo.cantosCasa;
+        document.getElementById('cantosFora').value = jogo.cantosFora;
+        document.getElementById('diferencaGols').value = jogo.diferencaGols;
+        document.getElementById('apCasa').value = jogo.apCasa;
+        document.getElementById('apFora').value = jogo.apFora;
+        document.getElementById('odd').value = jogo.odd;
+        document.getElementById('stake').value = jogo.stake;
+        
+        removerAlertaPainel(jogo.id);
+        calcularEExibir();
+    }
+
+    function removerAlertaPainel(id) {
+        listaEspera = listaEspera.filter(j => String(j.id) !== String(id));
+        localStorage.setItem('funil_espera', JSON.stringify(listaEspera));
+        
+        pararSireneSeNaoHouverAlertas();
+        renderizarEspera();
+        atualizarContadorEsperaAbas();
+    }
+
+    function excluirItemEspera(id) {
+        listaEspera = listaEspera.filter(j => String(j.id) !== String(id));
+        localStorage.setItem('funil_espera', JSON.stringify(listaEspera));
+        
+        pararSireneSeNaoHouverAlertas();
+        renderizarEspera();
+        atualizarContadorEsperaAbas();
+    }
+
+    function limparTodaEspera() {
+        if (confirm("Deseja limpar todos os jogos em espera?")) {
+            listaEspera = [];
+            localStorage.setItem('funil_espera', JSON.stringify(listaEspera));
+            desligarSirene();
+            renderizarEspera();
+            atualizarContadorEsperaAbas();
+        }
+    }
+
+    function atualizarContadorEsperaAbas() {
+        document.getElementById('countEspera').innerText = listaEspera.length;
+    }
+
+    function renderizarEspera() {
+        const container = document.getElementById('esperaLista');
+        container.innerHTML = '';
+
+        if (listaEspera.length === 0) {
+            container.innerHTML = '<div class="empty-history">Nenhum jogo aguardando tempo alvo.</div>';
+            return;
+        }
+
+        listaEspera.forEach(jogo => {
+            const msec = jogo.timestampFim - Date.now();
+            let tempoTexto = "00:00";
+            let classePronto = "";
+
+            if (msec > 0) {
+                const totalSegundos = Math.floor(msec / 1000);
+                const min = Math.floor(totalSegundos / 60);
+                const seg = totalSegundos % 60;
+                tempoTexto = `${min.toString().padStart(2, '0')}:${seg.toString().padStart(2, '0')}`;
+            } else {
+                tempoTexto = "PRONTO!";
+                classePronto = "ready";
+            }
+
+            const item = document.createElement('div');
+            item.className = 'waiting-item';
+            item.innerHTML = `
+                <div class="waiting-info">
+                    <span class="waiting-teams">${jogo.timeCasa} x ${jogo.timeFora}</span>
+                    <span class="waiting-meta">Modo: <b>${jogo.estrategia}</b> | Salvo com: ${jogo.tempoSalvo}'m | Alvo: <b>${jogo.alvoMinutos}'m</b></span>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <div class="waiting-timer ${classePronto}">${tempoTexto}</div>
+                    <button class="btn-waiting-delete" onclick="excluirItemEspera('${jogo.id}')">X</button>
+                </div>
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    // --- EXECUTA OS CÁLCULOS E RETORNA OS DADOS E VALIDAÇÃO ---
+    function calcularEExibir() {
+        const estrategia = document.getElementById('estrategia').value;
+        const tempo = parseInt(document.getElementById('tempo').value) || 1;
+        const diferencaGols = parseInt(document.getElementById('diferencaGols').value) || 0;
+        
+        const apCasa = parseInt(document.getElementById('apCasa').value) || 0;
+        const apFora = parseInt(document.getElementById('apFora').value) || 0;
+        const apTotal = apCasa + apFora; 
+        
+        const cantosCasa = parseInt(document.getElementById('cantosCasa').value) || 0;
+        const cantosFora = parseInt(document.getElementById('cantosFora').value) || 0;
+        const cantosAtuais = cantosCasa + cantosFora;
+
+        const tempoFinalAlvo = (estrategia === "HT") ? 45 : 95;
+        const projecaoCantos = cantosAtuais + ((cantosAtuais / tempo) * (tempoFinalAlvo - tempo));
+
+        const mercadoAsiatico = `+${(cantosAtuais + 1).toFixed(1)} Asiático`;
+        const mercadoLimite = `+${(cantosAtuais + 0.5).toFixed(1)}`;
+        
+        const appm = apTotal / tempo;
+        let entradaValida = false;
+
+        if (estrategia === "HT") {
+            if (tempo >= 33 && tempo <= 40 && diferencaGols <= 1 && appm >= 1.0) entradaValida = true;
+        } else {
+            if (tempo >= 80 && tempo <= 90 && diferencaGols <= 1 && appm >= 1.0) entradaValida = true;
+        }
+
+        exibirResultadoNoTopo(entradaValida, estrategia, appm, projecaoCantos, mercadoAsiatico, mercadoLimite);
+
+        return {
+            estrategia, tempo, diferencaGols, apTotal, apCasa, apFora,
+            cantosCasa, cantosFora, cantosAtuais, projecaoCantos,
+            mercadoAsiatico, mercadoLimite, appm, entradaValida
+        };
+    }
+
+    // --- ANALISAR E SALVAR NO HISTÓRICO ---
+    function analisarESalvar() {
+        const timeCasa = document.getElementById('timeCasa').value.trim() || 'Mandante';
+        const timeFora = document.getElementById('timeFora').value.trim() || 'Visitante';
+        const odd = parseFloat(document.getElementById('odd').value) || 1.80;
+        const stake = parseFloat(document.getElementById('stake').value) || 10.00;
+
+        const dados = calcularEExibir();
+
+        const hoje = new Date();
+        const dataStr = hoje.toLocaleDateString('pt-BR');
+
+        const novaAnalise = {
+            id: Date.now(),
+            data: dataStr,
+            timeCasa: timeCasa,
+            timeFora: timeFora,
+            estrategia: dados.estrategia,
+            tempo: dados.tempo,
+            diferencaGols: dados.diferencaGols,
+            ap: dados.apTotal,
+            apCasa: dados.apCasa,
+            apFora: dados.apFora,
+            cantosCasa: dados.cantosCasa,
+            cantosFora: dados.cantosFora,
+            cantosAtuais: dados.cantosAtuais,
+            projecaoCantos: dados.projecaoCantos.toFixed(1),
+            mercadoAsiatico: dados.mercadoAsiatico,
+            mercadoLimite: dados.mercadoLimite,
+            appm: dados.appm.toFixed(2),
+            odd: odd.toFixed(2),
+            stake: stake.toFixed(2),
+            valido: dados.entradaValida,
+            status: 'pending'
+        };
+
+        historico.unshift(novaAnalise);
+        salvarDados();
+        atualizarDashboard();
+    }
+
+    function exibirResultadoNoTopo(valido, estrategia, appm, projecao, mAsiatico, mLimite) {
+        const resultadoTop = document.getElementById('resultadoTop');
+        const projTexto = `<div class="proj-text">📈 Projeção Estatística: <b>${projecao.toFixed(1)}</b> cantos no final do jogo</div>`;
+        const mercadoTexto = `<div class="mercado-text">🎯 Mercado Alvo: <b>${mAsiatico}</b> | Limite: <b>${mLimite}</b></div>`;
+        
+        if (valido) {
+            resultadoTop.innerHTML = `<div>🔥 ENTRADA CONFIRMADA (${estrategia})! APPM: ${appm.toFixed(2)}</div> ${projTexto} ${mercadoTexto}`;
+            resultadoTop.className = "result-box valido";
+        } else {
+            resultadoTop.innerHTML = `<div>❌ SINAL RECUSADO (${estrategia}). APPM: ${appm.toFixed(2)}</div> ${projTexto} ${mercadoTexto}`;
+            resultadoTop.className = "result-box invalido";
+        }
+    }
+
+    function salvarDados() {
+        localStorage.setItem('funil_historico', JSON.stringify(historico));
+    }
+
+    function atualizarDashboard() {
+        const total = historico.length;
+        const greens = historico.filter(i => i.status === 'green').length;
+        const reds = historico.filter(i => i.status === 'red').length;
+        const refunds = historico.filter(i => i.status === 'refund').length;
+        
+        let saldoFinanceiro = 0;
+        historico.forEach(item => {
+            const stk = parseFloat(item.stake) || 0;
+            const od = parseFloat(item.odd) || 0;
+            if (item.status === 'green') saldoFinanceiro += stk * (od - 1);
+            else if (item.status === 'red') saldoFinanceiro -= stk;
+        });
+
+        document.getElementById('statGeral').innerText = total;
+        document.getElementById('statGreen').innerText = greens;
+        document.getElementById('statRed').innerText = reds;
+        document.getElementById('statRefund').innerText = refunds;
+        
+        const finElement = document.getElementById('statFinanceiro');
+        finElement.innerText = `R$ ${saldoFinanceiro.toFixed(2)}`;
+        finElement.className = "stat-val " + (saldoFinanceiro > 0 ? "profit" : (saldoFinanceiro < 0 ? "loss" : ""));
+
+        const totalDecisivos = greens + reds;
+        let percentual = totalDecisivos > 0 ? Math.round((greens / totalDecisivos) * 100) : 0;
+
+        document.getElementById('thermometerBar').style.width = `${percentual}%`;
+        document.getElementById('thermometerText').innerText = totalDecisivos > 0 ? `ASSERTIVIDADE: ${percentual}% (${greens}/${totalDecisivos})` : 'Aguardando resultados decisivos...';
+    }
+
+    function marcarStatus(id, novoStatus) {
+        const item = historico.find(i => i.id === id);
+        if (item) {
+            item.status = item.status === novoStatus ? 'pending' : novoStatus;
+            salvarDados();
+            atualizarDashboard();
+            renderizarHistorico(item.data); 
+        }
+    }
+
+    function excluirItem(id, dataGrupo) {
+        historico = historico.filter(i => i.id !== id);
+        salvarDados();
+        atualizarDashboard();
+        renderizarHistorico(dataGrupo);
+    }
+
+    function limparTodoHistorico() {
+        if (confirm("Tem certeza que deseja apagar todo o histórico?")) {
+            historico = [];
+            salvarDados();
+            atualizarDashboard();
+            renderizarHistorico();
+        }
+    }
+
+    function toggleDataGrupo(elemento) {
+        elemento.parentElement.classList.toggle('active');
+    }
+
+    function renderizarHistorico(grupoAbertoId = null) {
+        const container = document.getElementById('historicoLista');
+        container.innerHTML = '';
+
+        if (historico.length === 0) {
+            container.innerHTML = '<div class="empty-history">Nenhuma análise salva ainda.</div>';
+            return;
+        }
+
+        const grupos = {};
+        historico.forEach((item) => {
+            if (!grupos[item.data]) grupos[item.data] = [];
+            grupos[item.data].push(item);
+        });
+
+        const chavesDatas = Object.keys(grupos);
+        const dataMaisRecente = chavesDatas[0];
+
+        chavesDatas.forEach((data) => {
+            const groupDiv = document.createElement('div');
+            const deveraEstarAberto = grupoAbertoId ? (grupoAbertoId === data) : (data === dataMaisRecente);
+            groupDiv.className = `date-group ${deveraEstarAberto ? 'active' : ''}`;
+            
+            let htmlGrupo = `
+                <button class="date-header-btn" onclick="toggleDataGrupo(this)">
+                    📅 Dia ${data} (${grupos[data].length} entradas)
+                </button>
+                <div class="date-content">
+            `;
+            
+            grupos[data].forEach((item) => {
+                let statusClass = 'status-pending';
+                let statusLabel = 'Pendente';
+                let pillClass = 'pill-pending';
+                
+                if (item.status === 'green') {
+                    statusClass = 'status-green';
+                    statusLabel = `+R$ ${(item.stake * (item.odd - 1)).toFixed(2)}`;
+                    pillClass = 'pill-green';
+                } else if (item.status === 'red') {
+                    statusClass = 'status-red';
+                    statusLabel = `-R$ ${parseFloat(item.stake).toFixed(2)}`;
+                    pillClass = 'pill-red';
+                } else if (item.status === 'refund') {
+                    statusClass = 'status-refund';
+                    statusLabel = 'Reembolso';
+                    pillClass = 'pill-refund';
+                }
+
+                const verdictText = item.valido ? '🔥 INGRESSAR' : '❌ FORA';
+                const verdictClass = item.valido ? 'go' : 'no-go';
+                const detalheAPs = item.apCasa !== undefined ? `AP: ${item.ap} (${item.apCasa}v${item.apFora})` : `AP: ${item.ap}`;
+                const totalCantos = (item.cantosCasa || 0) + (item.cantosFora || 0);
+
+                htmlGrupo += `
+                    <div class="history-item ${statusClass}">
+                        <div class="item-main">
+                            <div class="item-teams">${item.timeCasa} x ${item.timeFora}</div>
+                            <span class="status-pill ${pillClass}">${statusLabel}</span>
+                        </div>
+                        <div class="item-details">
+                            <span class="item-strategy">${item.estrategia}</span> | 
+                            ${item.tempo}'m | Dist. Gols: ${item.diferencaGols} | ${detalheAPs}<br>
+                            🎯 Cantos Atuais: <b>${totalCantos}</b> (${item.cantosCasa}x${item.cantosFora}) | Projeção: <b>${item.projecaoCantos}</b><br>
+                            🎯 Linha Recomendada: <b>${item.mercadoAsiatico}</b> | Limite: <b>${item.mercadoLimite}</b><br>
+                            Odd: ${item.odd} | Stk: R$${item.stake}
+                        </div>
+                        <div class="item-verdict ${verdictClass}">
+                            ${verdictText} (APPM: ${item.appm})
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn-action btn-green" onclick="marcarStatus(${item.id}, 'green')">G</button>
+                            <button class="btn-action btn-red" onclick="marcarStatus(${item.id}, 'red')">R</button>
+                            <button class="btn-action btn-blue" onclick="marcarStatus(${item.id}, 'refund')">D</button>
+                            <button class="btn-action btn-delete" onclick="excluirItem(${item.id}, '${data}')">X</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            htmlGrupo += `</div>`;
+            groupDiv.innerHTML = htmlGrupo;
+            container.appendChild(groupDiv);
+        });
+    }
+</script>
+</body>
+</html>
