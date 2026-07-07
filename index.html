@@ -452,11 +452,11 @@
             <div class="form-row-two">
                 <div class="form-group">
                     <label>Cantos Casa:</label>
-                    <input type="number" id="cantosCasa" value="3" min="0">
+                    <input type="number" id="cantosCasa" value="3" min="0" class="auto-tab">
                 </div>
                 <div class="form-group">
                     <label>Cantos Fora:</label>
-                    <input type="number" id="cantosFora" value="2" min="0">
+                    <input type="number" id="cantosFora" value="2" min="0" class="auto-tab">
                 </div>
             </div>
 
@@ -470,26 +470,26 @@
                 </div>
                 <div class="form-group">
                     <label>Tempo (min):</label>
-                    <input type="number" id="tempo" value="35" min="1" max="120">
+                    <input type="number" id="tempo" value="35" min="1" max="120" class="auto-tab">
                 </div>
                 <div class="form-group">
                     <label>Dif. Gols:</label>
-                    <input type="number" id="diferencaGols" value="0" min="0">
+                    <input type="number" id="diferencaGols" value="0" min="0" class="auto-tab">
                 </div>
             </div>
 
             <div class="form-row-four">
                 <div class="form-group">
                     <label>AP Casa:</label>
-                    <input type="number" id="apCasa" value="22" min="0">
+                    <input type="number" id="apCasa" value="22" min="0" class="auto-tab">
                 </div>
                 <div class="form-group">
                     <label>AP Fora:</label>
-                    <input type="number" id="apFora" value="20" min="0">
+                    <input type="number" id="apFora" value="20" min="0" class="auto-tab">
                 </div>
                 <div class="form-group">
                     <label>ODD:</label>
-                    <input type="number" id="odd" value="1.80" step="0.01" min="1.01">
+                    <input type="number" id="odd" value="1.80" step="0.01" min="1.01" class="auto-tab">
                 </div>
                 <div class="form-group">
                     <label>Stake (R$):</label>
@@ -568,7 +568,47 @@
         renderizarHistorico();
         renderizarEspera();
         iniciarProcessamentoCronometro();
+        configurarAutoTab();
     };
+
+    // --- LÓGICA DE PULO AUTOMÁTICO DE CAMPOS ---
+    function configurarAutoTab() {
+        const sequenciaCampos = [
+            'cantosCasa',
+            'cantosFora', // Fora pula direto para o Tempo
+            'tempo',
+            'diferencaGols',
+            'apCasa',
+            'apFora',
+            'odd'
+        ];
+
+        document.querySelectorAll('.auto-tab').forEach(input => {
+            input.addEventListener('input', function() {
+                // Impede que passe de 2 dígitos (exceto no campo de ODD que usa ponto/casas decimais)
+                if (this.id !== 'odd' && this.value.length > 2) {
+                    this.value = this.value.slice(0, 2);
+                }
+
+                // Quando atinge 2 ou mais dígitos
+                if (this.value.length >= 2) {
+                    const indexAtual = sequenciaCampos.indexOf(this.id);
+                    
+                    if (indexAtual !== -1 && indexAtual < sequenciaCampos.length - 1) {
+                        const proximoId = sequenciaCampos[indexAtual + 1];
+                        const proximoElemento = document.getElementById(proximoId);
+                        
+                        if (proximoElemento) {
+                            proximoElemento.focus();
+                            if (proximoElemento.tagName === 'INPUT') {
+                                proximoElemento.select(); // Facilita digitar por cima do valor padrão
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    }
 
     function mudarTela(tela) {
         document.getElementById('telaCalculadora').classList.remove('active');
@@ -630,7 +670,7 @@
         }
     }
 
-    function executarBipeSirene() {
+    function ejecutarBipeSirene() {
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             
@@ -684,14 +724,14 @@
         const stake = document.getElementById('stake').value;
 
         const alvoMinutos = (estrategia === "HT") ? 30 : 80;
-        const minutosRestantes = alvoMinutos - tempoSalvo;
+        const minutesRestantes = alvoMinutos - tempoSalvo;
 
-        if (minutosRestantes <= 0) {
+        if (minutesRestantes <= 0) {
             alert(`A partida já passou ou está no tempo alvo (${alvoMinutos} min) para esta estratégia!`);
             return;
         }
 
-        const segundosTotaisNecessarios = minutosRestantes * 60;
+        const segundosTotaisNecessarios = minutesRestantes * 60;
         const timestampFim = Date.now() + (segundosTotaisNecessarios * 1000);
 
         const novoJogoEspera = {
@@ -718,7 +758,7 @@
         limparCamposFormulario();
         renderizarEspera();
         atualizarContadorEsperaAbas();
-        alert(`Sucesso! ${timeCasa} x ${timeFora} agendado para disparar em ${minutosRestantes} minutos.`);
+        alert(`Sucesso! ${timeCasa} x ${timeFora} agendado para disparar em ${minutesRestantes} minutos.`);
     }
 
     function iniciarProcessamentoCronometro() {
@@ -759,7 +799,6 @@
                 painel.style.flexDirection = "column";
                 painel.style.gap = "6px";
                 
-                // SÓ TOCA SE O ALERTA ESTIVER VISÍVEL NA TELA PRINCIPAL
                 dispararSireneContinua();
             } else {
                 painel.style.display = "none";
