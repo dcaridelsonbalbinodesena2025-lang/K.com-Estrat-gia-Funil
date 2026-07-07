@@ -452,11 +452,11 @@
             <div class="form-row-two">
                 <div class="form-group">
                     <label>Cantos Casa:</label>
-                    <input type="number" id="cantosCasa" value="3" min="0" class="auto-tab">
+                    <input type="number" id="cantosCasa" placeholder="ex: 03" min="0" class="auto-tab">
                 </div>
                 <div class="form-group">
                     <label>Cantos Fora:</label>
-                    <input type="number" id="cantosFora" value="2" min="0" class="auto-tab">
+                    <input type="number" id="cantosFora" placeholder="ex: 02" min="0" class="auto-tab">
                 </div>
             </div>
 
@@ -470,30 +470,30 @@
                 </div>
                 <div class="form-group">
                     <label>Tempo (min):</label>
-                    <input type="number" id="tempo" value="35" min="1" max="120" class="auto-tab">
+                    <input type="number" id="tempo" placeholder="ex: 35" min="1" max="120" class="auto-tab">
                 </div>
                 <div class="form-group">
                     <label>Dif. Gols:</label>
-                    <input type="number" id="diferencaGols" value="0" min="0" class="auto-tab">
+                    <input type="number" id="diferencaGols" placeholder="ex: 0" min="0" class="auto-tab">
                 </div>
             </div>
 
             <div class="form-row-four">
                 <div class="form-group">
                     <label>AP Casa:</label>
-                    <input type="number" id="apCasa" value="22" min="0" class="auto-tab">
+                    <input type="number" id="apCasa" placeholder="ex: 22" min="0" class="auto-tab">
                 </div>
                 <div class="form-group">
                     <label>AP Fora:</label>
-                    <input type="number" id="apFora" value="20" min="0" class="auto-tab">
+                    <input type="number" id="apFora" placeholder="ex: 20" min="0" class="auto-tab">
                 </div>
                 <div class="form-group">
                     <label>ODD:</label>
-                    <input type="number" id="odd" value="1.80" step="0.01" min="1.01" class="auto-tab">
+                    <input type="number" id="odd" placeholder="ex: 1.80" step="0.01" min="1.01" class="auto-tab">
                 </div>
                 <div class="form-group">
                     <label>Stake (R$):</label>
-                    <input type="number" id="stake" value="100.00" step="0.50" min="1">
+                    <input type="number" id="stake" placeholder="ex: 100" step="0.50" min="1">
                 </div>
             </div>
 
@@ -642,15 +642,15 @@
     function limparCamposFormulario() {
         document.getElementById('timeCasa').value = '';
         document.getElementById('timeFora').value = '';
-        document.getElementById('cantosCasa').value = '3';
-        document.getElementById('cantosFora').value = '2';
+        document.getElementById('cantosCasa').value = '';
+        document.getElementById('cantosFora').value = '';
         document.getElementById('estrategia').value = 'HT';
-        document.getElementById('tempo').value = '35';
-        document.getElementById('diferencaGols').value = '0';
-        document.getElementById('apCasa').value = '22';
-        document.getElementById('apFora').value = '20';
-        document.getElementById('odd').value = '1.80';
-        document.getElementById('stake').value = '100.00';
+        document.getElementById('tempo').value = '';
+        document.getElementById('diferencaGols').value = '';
+        document.getElementById('apCasa').value = '';
+        document.getElementById('apFora').value = '';
+        document.getElementById('odd').value = '';
+        document.getElementById('stake').value = '';
         
         document.getElementById('resultadoTop').innerHTML = 'Aguardando preenchimento dos dados para análise...';
         document.getElementById('resultadoTop').className = "result-box empty";
@@ -720,8 +720,8 @@
         const diferencaGols = parseInt(document.getElementById('diferencaGols').value) || 0;
         const apCasa = parseInt(document.getElementById('apCasa').value) || 0;
         const apFora = parseInt(document.getElementById('apFora').value) || 0;
-        const odd = document.getElementById('odd').value;
-        const stake = document.getElementById('stake').value;
+        const odd = document.getElementById('odd').value || '1.80';
+        const stake = document.getElementById('stake').value || '100.00';
 
         const alvoMinutos = (estrategia === "HT") ? 30 : 80;
         const minutesRestantes = alvoMinutos - tempoSalvo;
@@ -826,11 +826,11 @@
         document.getElementById('timeFora').value = jogo.timeFora;
         document.getElementById('estrategia').value = jogo.estrategia;
         document.getElementById('tempo').value = jogo.alvoMinutos; 
-        document.getElementById('cantosCasa').value = jogo.cantosCasa;
-        document.getElementById('cantosFora').value = jogo.cantosFora;
-        document.getElementById('diferencaGols').value = jogo.diferencaGols;
-        document.getElementById('apCasa').value = jogo.apCasa;
-        document.getElementById('apFora').value = jogo.apFora;
+        document.getElementById('cantosCasa').value = jogo.cantosCasa || '';
+        document.getElementById('cantosFora').value = jogo.cantosFora || '';
+        document.getElementById('diferencaGols').value = jogo.diferencaGols !== undefined ? jogo.diferencaGols : '';
+        document.getElementById('apCasa').value = jogo.apCasa || '';
+        document.getElementById('apFora').value = jogo.apFora || '';
         document.getElementById('odd').value = jogo.odd;
         document.getElementById('stake').value = jogo.stake;
         
